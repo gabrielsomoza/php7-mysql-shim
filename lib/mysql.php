@@ -743,12 +743,9 @@ namespace Dshafik {
                 MYSQLI_TIMESTAMP_FLAG => "timestamp",
             ];
 
-            $fieldFlags = [];
-            foreach ($flags as $flag => $value) {
-                if ($what & $flag) {
-                    $fieldFlags[] = $value;
-                }
-            }
+            $fieldFlags = array_filter($flags, function($flag) use ($what) {
+                return $what & $flag;
+            });
 
             return implode(" ", $fieldFlags);
         }
