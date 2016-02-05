@@ -693,12 +693,15 @@ namespace Dshafik {
 
         public static function escapeString($unescapedString)
         {
-            $escapedString = "";
-            for ($i = 0; $i < strlen($unescapedString); $i++) {
-                $escapedString .= self::escapeChar($unescapedString{$i});
-            }
+            $map = [
+                "#\0#" => "\\0",
+                "#\n#" => "\\n",
+                "#\r#" => "\\r",
+                "#\032#" => "\\Z",
+                "#(\\|'|\")#" => '\\$1'
+            ];
 
-            return $escapedString;
+            return preg_replace(array_keys($map), array_values($map), $unescapedString);
         }
 
         protected static function getFieldFlags($what)
@@ -736,65 +739,31 @@ namespace Dshafik {
                 MYSQLI_TYPE_VAR_STRING => 'string',
                 MYSQLI_TYPE_ENUM => 'string',
                 MYSQLI_TYPE_SET => 'string',
-
                 MYSQLI_TYPE_LONG => 'int',
                 MYSQLI_TYPE_TINY => 'int',
                 MYSQLI_TYPE_SHORT => 'int',
                 MYSQLI_TYPE_INT24 => 'int',
                 MYSQLI_TYPE_CHAR => 'int',
                 MYSQLI_TYPE_LONGLONG => 'int',
-
                 MYSQLI_TYPE_DECIMAL => 'real',
                 MYSQLI_TYPE_FLOAT => 'real',
                 MYSQLI_TYPE_DOUBLE => 'real',
                 MYSQLI_TYPE_NEWDECIMAL => 'real',
-
-                MYSQLI_TYPE_TINY_BLOB => 'blob',
-                MYSQLI_TYPE_MEDIUM_BLOB => 'blob',
-                MYSQLI_TYPE_LONG_BLOB => 'blob',
-                MYSQLI_TYPE_BLOB => 'blob',
-
+                MYSQLI_TYPE_DATETIME => 'datetime',
+                MYSQLI_TYPE_TIMESTAMP => 'timestamp',
                 MYSQLI_TYPE_NEWDATE => 'date',
                 MYSQLI_TYPE_DATE => 'date',
                 MYSQLI_TYPE_TIME => 'time',
                 MYSQLI_TYPE_YEAR => 'year',
-                MYSQLI_TYPE_DATETIME => 'datetime',
-                MYSQLI_TYPE_TIMESTAMP => 'timestamp',
-
+                MYSQLI_TYPE_TINY_BLOB => 'blob',
+                MYSQLI_TYPE_MEDIUM_BLOB => 'blob',
+                MYSQLI_TYPE_LONG_BLOB => 'blob',
+                MYSQLI_TYPE_BLOB => 'blob',
                 MYSQLI_TYPE_NULL => 'null',
-
                 MYSQLI_TYPE_GEOMETRY => 'geometry',
             ];
 
             return isset($types[$what]) ? $types[$what] : "unknown";
-        }
-
-        protected static function escapeChar($char)
-        {
-            switch ($char) {
-                case "\0":
-                    $esc = "\\0";
-                    break;
-                case "\n":
-                    $esc = "\\n";
-                    break;
-                case "\r":
-                    $esc = "\\r";
-                    break;
-                case '\\':
-                case '\'':
-                case '"':
-                    $esc = "\\{$char}";
-                    break;
-                case "\032":
-                    $esc = "\\Z";
-                    break;
-                default:
-                    $esc = $char;
-                    break;
-            }
-            
-            return $esc;
         }
     }
 }
